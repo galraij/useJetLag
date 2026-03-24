@@ -12,6 +12,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AdminPage from './pages/AdminPage';
 import ExplorePage from './pages/ExplorePage';
+import GetStartedUploadPage from './pages/GetStartedUploadPage';
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
         </Route>
 
         <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/get-started-upload" element={<GetStartedUploadPage />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

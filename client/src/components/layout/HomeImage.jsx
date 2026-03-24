@@ -36,7 +36,13 @@ export default function HomeImage() {
                         >
                             Explore Trips
                         </Button>
-                        <Button size="lg" color="orange" rightSection={<Sparkles size={20} />}>
+                        <Button 
+                            size="lg" 
+                            color="orange" 
+                            component={Link}
+                            to="/get-started-upload"
+                            rightSection={<Sparkles size={20} />}
+                        >
                             Get Started Free
                         </Button>
 
