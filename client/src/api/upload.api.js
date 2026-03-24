@@ -10,3 +10,7 @@ export const uploadWithExif = (files) => {
   files.forEach((f) => form.append('images', f));
   return api.post('/upload/with-exif', form, { headers: { 'Content-Type': 'multipart/form-data' } });
 };
+
+export const getUploadedPictures = () => {
+  return api.get('/upload/with-exif');
+};

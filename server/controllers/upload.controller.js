@@ -59,4 +59,11 @@ async function uploadWithExif(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { uploadImages, uploadWithExif };
+async function getUploadedPictures(req, res, next) {
+  try {
+    const pictures = await UploadedPictureModel.getAll();
+    res.status(200).json({ success: true, pictures });
+  } catch (err) { next(err); }
+}
+
+module.exports = { uploadImages, uploadWithExif, getUploadedPictures };

@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Container, Title, Button, Text } from '@mantine/core';
+import { Container, Title, Button, Text, Group } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
 import FolderDropZone from '../components/upload/FolderDropZone';
 import { uploadWithExif } from '../api/upload.api';
 
 export default function GetStartedUploadPage() {
   const [loading, setLoading] = useState(false);
   const [uploadedPictures, setUploadedPictures] = useState(null);
+  const navigate = useNavigate();
 
   async function handleFiles(files) {
     setLoading(true);
@@ -47,7 +49,10 @@ export default function GetStartedUploadPage() {
               </div>
             ))}
           </div>
-          <Button mt="xl" onClick={() => setUploadedPictures(null)}>Upload More</Button>
+          <Group mt="xl">
+            <Button onClick={() => setUploadedPictures(null)} variant="outline">Upload More</Button>
+            <Button onClick={() => navigate('/trip')} color="orange">View Trip</Button>
+          </Group>
         </>
       )}
     </Container>

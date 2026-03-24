@@ -9,6 +9,13 @@ const UploadedPictureModel = {
       [url, dateTaken, latitude, longitude]
     );
     return rows[0];
+  },
+
+  async getAll() {
+    const { rows } = await pool.query(
+      `SELECT * FROM uploaded_pictures ORDER BY created_at ASC`
+    );
+    return rows;
   }
 };
 

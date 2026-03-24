@@ -13,6 +13,7 @@ import RegisterPage from './pages/RegisterPage';
 import AdminPage from './pages/AdminPage';
 import ExplorePage from './pages/ExplorePage';
 import GetStartedUploadPage from './pages/GetStartedUploadPage';
+import TripPage from './pages/TripPage';
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
 
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/get-started-upload" element={<GetStartedUploadPage />} />
+        <Route path="/trip" element={<TripPage />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
