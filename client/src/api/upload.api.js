@@ -12,5 +12,9 @@ export const uploadWithExif = (files) => {
 };
 
 export const getUploadedPictures = () => {
-  return api.get('/upload/with-exif');
+  return api.get('/upload');
+};
+
+export const deletePicture = (id) => {
+  return api.delete(`/upload/${id}`);
 };

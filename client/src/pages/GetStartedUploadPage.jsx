@@ -13,7 +13,15 @@ export default function GetStartedUploadPage() {
     setLoading(true);
     try {
       const { data } = await uploadWithExif(files);
-      setUploadData(data);
+      const isMissingExif = data.pictures.some(pic => !pic.latitude || !pic.longitude || !pic.date_taken);
+      
+      if (!isMissingExif) {
+        // Continue straight to the trip page if all EXIF is perfect
+        navigate(`/trip/${data.trip.slug}`);
+      } else {
+        // Stay on page and show which info is missing
+        setUploadData(data);
+      }
     } catch (err) {
       console.error(err);
       alert('Failed to upload pictures');
@@ -51,7 +59,7 @@ export default function GetStartedUploadPage() {
           </div>
           <Group mt="xl">
             <Button onClick={() => setUploadData(null)} variant="outline">Upload More</Button>
-            <Button onClick={() => navigate(`/trip/${uploadData.trip.slug}`)} color="orange">View Trip</Button>
+            <Button onClick={() => navigate(`/trip/${uploadData.trip.slug}`)} color="orange">Continue anyway</Button>
           </Group>
         </>
       )}

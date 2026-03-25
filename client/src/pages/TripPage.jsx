@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Title, TextInput, SimpleGrid, Loader, Center, Text, Button, Group, Card, List, ThemeIcon, Grid, Box } from '@mantine/core';
+import { useParams } from 'react-router-dom';
+import { Container, Title, Loader, Center, Text, Button, Card, List, ThemeIcon, Grid, Box, SimpleGrid } from '@mantine/core';
 import { Sparkles, MapPin } from 'lucide-react';
-import { getTripBySlug, updateTripTitle, generateTripStory } from '../api/trips.api';
+import { getTripBySlug, generateTripStory } from '../api/trips.api';
+import { deletePicture } from '../api/upload.api';
 import PictureItem from '../components/upload/PictureItem';
 
 export default function TripPage() {
   const { slug } = useParams();
-  const navigate = useNavigate();
   
   const [trip, setTrip] = useState({});
-  const [title, setTitle] = useState('');
   const [pictures, setPictures] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
@@ -22,7 +20,6 @@ export default function TripPage() {
         setLoading(true);
         const { data } = await getTripBySlug(slug);
         setTrip(data.trip || {});
-        setTitle(data.trip.title);
         setPictures(data.pictures || []);
       } catch (error) {
         console.error("Failed to load trip", error);
@@ -36,17 +33,14 @@ export default function TripPage() {
     }
   }, [slug]);
 
-  async function handleSave() {
-    if (!title.trim()) return;
-    setSaving(true);
+  async function handleDeletePicture(id) {
+    // Delete from DB and update state instantly
     try {
-      const { data } = await updateTripTitle(slug, title);
-      navigate(`/trip/${data.trip.slug}`);
+      await deletePicture(id);
+      setPictures(prev => prev.filter(p => p.id !== id));
     } catch (err) {
       console.error(err);
-      alert('Failed to save title');
-    } finally {
-      setSaving(false);
+      alert('Failed to delete picture');
     }
   }
 
@@ -78,30 +72,7 @@ export default function TripPage() {
 
   return (
     <Container pt="xl" size="xl">
-      <Group justify="center" align="center" mb="xl">
-        <TextInput
-          size="xl"
-          variant="unstyled"
-          styles={{ input: { fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center' } }}
-          value={title}
-          onChange={(e) => setTitle(e.currentTarget.value)}
-        />
-        <Button onClick={handleSave} loading={saving} color="blue" variant="light">
-          Save Title
-        </Button>
-      </Group>
-
-      <Center mb="xl">
-        <Button 
-          onClick={handleGenerateStory} 
-          loading={generating} 
-          leftSection={<Sparkles size={16} />} 
-          color="grape" 
-          size="md"
-        >
-          Generate Trip Story with AI ✨
-        </Button>
-      </Center>
+      <Title order={1} mb="xl" ta="center">{trip.title}</Title>
 
       {loading ? (
         <Center mt="xl"><Loader /></Center>
@@ -136,7 +107,7 @@ export default function TripPage() {
                     )}
                     <SimpleGrid cols={{ base: 1, sm: group.length }} spacing="lg">
                       {group.map((pic) => (
-                        <PictureItem key={pic.id} picture={pic} />
+                        <PictureItem key={pic.id} picture={pic} onDelete={handleDeletePicture} />
                       ))}
                     </SimpleGrid>
                   </div>
@@ -171,6 +142,19 @@ export default function TripPage() {
           </Grid.Col>
         </Grid>
       )}
+
+      {/* Put generate button at the bottom of everything */}
+      <Center mt="xl" pb="xl">
+        <Button 
+          onClick={handleGenerateStory} 
+          loading={generating} 
+          leftSection={<Sparkles size={16} />} 
+          color="grape" 
+          size="lg"
+        >
+          useJetLag
+        </Button>
+      </Center>
     </Container>
   );
 }

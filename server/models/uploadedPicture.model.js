@@ -31,6 +31,10 @@ const UploadedPictureModel = {
       `UPDATE uploaded_pictures SET punchy_description = $1, story_segment = $2 WHERE id = $3`,
       [punchy_description, story_segment, id]
     );
+  },
+
+  async deleteById(id) {
+    await pool.query(`DELETE FROM uploaded_pictures WHERE id = $1`, [id]);
   }
 };
 

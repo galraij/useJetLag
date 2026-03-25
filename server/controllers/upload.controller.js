@@ -86,8 +86,18 @@ async function uploadWithExif(req, res, next) {
       })
     );
 
-    res.status(200).json({ success: true, trip: newTrip, pictures: results });
+    res.status(201).json({ success: true, pictures: results, trip: newTrip });
   } catch (err) { next(err); }
+}
+
+async function deletePicture(req, res, next) {
+  try {
+    const { id } = req.params;
+    await UploadedPictureModel.deleteById(id);
+    res.status(200).json({ success: true });
+  } catch (err) {
+    next(err);
+  }
 }
 
 async function getUploadedPictures(req, res, next) {
@@ -97,4 +107,4 @@ async function getUploadedPictures(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { uploadImages, uploadWithExif, getUploadedPictures };
+module.exports = { uploadImages, uploadWithExif, getUploadedPictures, deletePicture };
