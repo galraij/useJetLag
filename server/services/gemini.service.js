@@ -25,6 +25,7 @@ Return only a valid JSON object with the following structure. Do not include mar
 
 Required JSON Schema:
 {
+  "catchy_title": "string",
   "photos": [
     {
       "image_id": "string (from input)",

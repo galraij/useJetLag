@@ -11,3 +11,7 @@ export const updateTripTitle = (slug, title) => {
 export const generateTripStory = (slug) => {
   return api.post(`/trips/${slug}/generate-story`);
 };
+
+export const publishTripStory = (slug, draftData) => {
+  return api.put(`/trips/${slug}/publish`, draftData);
+};

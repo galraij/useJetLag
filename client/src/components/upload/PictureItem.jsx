@@ -1,7 +1,7 @@
-import { Card, Text, Group, Badge, Image, Box, ActionIcon } from '@mantine/core';
+import { Card, Text, Group, Badge, Image, Box, ActionIcon, Textarea } from '@mantine/core';
 import { X } from 'lucide-react';
 
-export default function PictureItem({ picture, onDelete }) {
+export default function PictureItem({ picture, onDelete, onDescChange }) {
   // Format the date taken
   const formattedDate = picture.date_taken 
     ? new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).format(new Date(picture.date_taken))
@@ -16,7 +16,7 @@ export default function PictureItem({ picture, onDelete }) {
           color="red" 
           variant="filled" 
           radius="xl"
-          style={{ position: 'absolute', top: 5, left: 5, zIndex: 10 }}
+          style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }}
           onClick={() => onDelete(picture.id)}
         >
           <X size={16} />
@@ -24,7 +24,7 @@ export default function PictureItem({ picture, onDelete }) {
       )}
 
       {/* Header section with Date and Weather */}
-      <Group justify="space-between" mb="xs" align="flex-start">
+      <Group justify="space-between" mb="xs" align="flex-start" pl={onDelete ? 36 : 0}>
         <Text fw={500} size="sm">{formattedDate}</Text>
         {picture.weather_temp !== null && picture.weather_temp !== undefined ? (
           <Group gap="xs" align="center">
@@ -53,10 +53,17 @@ export default function PictureItem({ picture, onDelete }) {
         />
       </Card.Section>
 
-      {picture.punchy_description && (
-        <Text mt="md" fw={500} size="md">
-          {picture.punchy_description}
-        </Text>
+      {(picture.punchy_description || onDescChange) && (
+        <Textarea
+          mt="md"
+          fw={500}
+          size="md"
+          variant="unstyled"
+          styles={{ input: { padding: 0 } }}
+          autosize
+          value={picture.punchy_description || ''}
+          onChange={(e) => onDescChange(e.currentTarget.value)}
+        />
       )}
 
       {/* Footer section with Location */}
