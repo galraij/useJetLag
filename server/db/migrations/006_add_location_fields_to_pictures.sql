@@ -1,0 +1,3 @@
+ALTER TABLE uploaded_pictures ADD COLUMN IF NOT EXISTS city TEXT;
+ALTER TABLE uploaded_pictures ADD COLUMN IF NOT EXISTS country TEXT;
+ALTER TABLE uploaded_pictures ADD COLUMN IF NOT EXISTS poi TEXT;

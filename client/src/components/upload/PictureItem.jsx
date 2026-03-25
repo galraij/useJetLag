@@ -33,16 +33,35 @@ export default function PictureItem({ picture }) {
         <Image
           src={picture.url}
           alt="Trip photo"
-          height={200}
+          height={400} // Made bigger because the single column timeline layout gives it more width!
           fit="cover"
         />
       </Card.Section>
 
+      {picture.punchy_description && (
+        <Text mt="md" fw={500} size="md">
+          {picture.punchy_description}
+        </Text>
+      )}
+
       {/* Footer section with Location */}
       <Box mt="md" ta="right">
-        <Text size="sm" c="dimmed">
-          📍 Location placeholder
-        </Text>
+        {picture.poi || picture.city || picture.country ? (
+          <>
+            {picture.poi && (
+              <Text size="sm" fw={600}>
+                📍 {picture.poi}
+              </Text>
+            )}
+            <Text size="xs" c="dimmed">
+              {[picture.city, picture.country].filter(Boolean).join(', ')}
+            </Text>
+          </>
+        ) : (
+          <Text size="sm" c="dimmed">
+            📍 Unknown Location
+          </Text>
+        )}
       </Box>
     </Card>
   );

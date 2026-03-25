@@ -49,12 +49,22 @@ async function uploadWithExif(req, res, next) {
 
         let weatherTemp = null;
         let weatherIcon = null;
+        let city = null;
+        let country = null;
+        let poi = null;
 
         if (latitude && longitude) {
           const weather = await require('../services/weather.service').getWeather(latitude, longitude, dateTaken);
           if (weather) {
             weatherTemp = weather.temperature;
             weatherIcon = weather.icon;
+          }
+
+          const geocode = await require('../services/geocoding.service').reverseGeocode(latitude, longitude);
+          if (geocode) {
+            city = geocode.city;
+            country = geocode.country;
+            poi = geocode.poi;
           }
         }
 
@@ -66,7 +76,10 @@ async function uploadWithExif(req, res, next) {
           longitude,
           tripId: newTrip.id,
           weatherTemp,
-          weatherIcon
+          weatherIcon,
+          city,
+          country,
+          poi
         });
 
         return savedPic;
