@@ -23,6 +23,35 @@ export default function TripPage() {
     async function fetchData() {
       try {
         setLoading(true);
+        // Check for pending publish in local storage
+        const pendingDataStr = localStorage.getItem('pendingTripPublish');
+        if (pendingDataStr && isLoggedIn) {
+          try {
+            const { trip: savedTrip, pictures: savedPictures } = JSON.parse(pendingDataStr);
+            if (savedTrip.slug === slug) {
+              const payload = {
+                title: savedTrip.title,
+                story_summary: savedTrip.story_summary,
+                points_of_interest: savedTrip.points_of_interest,
+                pictures: savedPictures.map(p => ({
+                  id: p.id,
+                  punchy_description: p.punchy_description,
+                  story_segment: p.story_segment
+                }))
+              };
+              const { data } = await publishTripStory(slug, payload);
+              localStorage.removeItem('pendingTripPublish');
+              
+              setTrip(data.trip);
+              setPictures(data.pictures || []);
+              setLoading(false);
+              return; // Skip normal fetch, we got the fresh published data
+            }
+          } catch (err) {
+            console.error("Auto publish failed", err);
+          }
+        }
+
         const { data } = await getTripBySlug(slug);
         
         let loadedTrip = data.trip || {};
@@ -88,6 +117,7 @@ export default function TripPage() {
 
   async function handlePublish() {
     if (!isLoggedIn) {
+      localStorage.setItem('pendingTripPublish', JSON.stringify({ trip, pictures }));
       navigate('/login', { state: { from: `/trip/${slug}` } });
       return;
     }
@@ -104,7 +134,9 @@ export default function TripPage() {
         }))
       };
       const { data } = await publishTripStory(slug, payload);
-      navigate(`/trip/${data.trip.slug}`);
+      setTrip(data.trip);
+      setPictures(data.pictures || []);
+      navigate(`/trip/${data.trip.slug}`, { replace: true });
     } catch (err) {
       console.error(err);
       alert('Failed to publish story');

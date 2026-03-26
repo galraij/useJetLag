@@ -11,17 +11,18 @@ const TripModel = {
 
   async getBySlug(slug) {
     const { rows } = await pool.query(
-      `SELECT * FROM trips WHERE slug = $1`,
+      `SELECT trips.*, users.name as user_name FROM trips LEFT JOIN users ON trips.user_id = users.id WHERE trips.slug = $1`,
       [slug]
     );
     return rows[0];
   },
 
-  async update(id, { title, slug }) {
-    const { rows } = await pool.query(
-      `UPDATE trips SET title = $1, slug = $2 WHERE id = $3 RETURNING *`,
-      [title, slug, id]
-    );
+  async update(id, { title, slug, userId }) {
+    const query = userId 
+      ? `UPDATE trips SET title = $1, slug = $2, user_id = COALESCE(user_id, $3) WHERE id = $4 RETURNING *`
+      : `UPDATE trips SET title = $1, slug = $2 WHERE id = $3 RETURNING *`;
+    const params = userId ? [title, slug, userId, id] : [title, slug, id];
+    const { rows } = await pool.query(query, params);
     return rows[0];
   },
 
