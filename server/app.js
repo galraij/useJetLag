@@ -13,6 +13,13 @@ const app = express();
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
 app.use(express.json());
 
+// Request logging to help debug auth
+app.use((req, res, next) => {
+  console.log(`[${req.method}] ${req.url}`, req.body);
+  next();
+});
+
+
 // Routes → Controllers → Models (MVC flow)
 app.use('/auth',   authRoutes);
 app.use('/upload', uploadRoutes);

@@ -6,12 +6,12 @@
 const pool = require('../db/pool');
 
 const UserModel = {
-  async create({ email, passwordHash, name }) {
+  async create({ email, password_hash, name }) {
     const { rows } = await pool.query(
       `INSERT INTO users (email, password_hash, name)
        VALUES ($1, $2, $3)
        RETURNING id, email, name, role`,
-      [email, passwordHash, name]
+      [email, password_hash, name]
     );
     return rows[0];
   },

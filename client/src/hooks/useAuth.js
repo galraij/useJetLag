@@ -1,7 +1,7 @@
 import { useAuthStore } from '../store/authStore';
 import * as authApi from '../api/auth.api';
 
-export function useAuth() {
+export default function useAuth() {
   const { user, token, setAuth, logout } = useAuthStore();
 
   async function loginUser(email, password) {
