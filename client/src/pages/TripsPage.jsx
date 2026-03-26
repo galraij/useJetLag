@@ -1,11 +1,62 @@
-import { Link } from 'react-router-dom';
-import { Container, Title, Text, Button, Grid, Card, Image, Badge, Group, Stack, AspectRatio, ActionIcon } from '@mantine/core';
-import { Plus, MapPin, Calendar, Upload, Eye, Trash2 } from 'lucide-react';
-import { useTravel } from '../context/TravelContext';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Container, Title, Text, Button, Grid, Card, Image, Badge, Group, Stack, AspectRatio, ActionIcon, Loader, Center } from '@mantine/core';
+import { Plus, MapPin, Calendar, Upload, Eye, Trash2, Edit } from 'lucide-react';
+import { getMyTrips } from '../api/trips.api';
+import useAuth from '../hooks/useAuth';
 
 export default function TripsPage() {
-  const { trips, user, deleteTrip } = useTravel();
-  const userTrips = trips.filter(trip => trip.userId === user?.id);
+  const [userTrips, setUserTrips] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+
+    async function fetchTrips() {
+      try {
+        const { data } = await getMyTrips();
+        if (data && data.trips) {
+          setUserTrips(data.trips);
+        }
+      } catch (err) {
+        console.error("Failed to load trips", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTrips();
+  }, [isLoggedIn, navigate]);
+
+  const handleDelete = (id) => {
+    // Note: Backend deletion endpoint would need to be implemented for this to actually delete it
+    // For now, we update local state
+    if (confirm('Delete this trip?')) {
+      setUserTrips(prev => prev.filter(t => t.id !== id));
+      alert("Delete function coming soon!");
+    }
+  };
+
+  const formatDateRange = (earliest, latest) => {
+    if (!earliest || !latest) return "Unknown Dates";
+    const opts = { day: 'numeric', month: 'short', year: 'numeric' };
+    const eStr = new Intl.DateTimeFormat('en-GB', opts).format(new Date(earliest));
+    const lStr = new Intl.DateTimeFormat('en-GB', opts).format(new Date(latest));
+    return eStr === lStr ? eStr : `${eStr} - ${lStr}`;
+  };
+
+  if (loading) {
+    return (
+      <Center mt={80}>
+        <Loader size="xl" />
+      </Center>
+    );
+  }
 
   return (
     <Container size="xl" py="xl">
@@ -50,39 +101,43 @@ export default function TripsPage() {
                 </Card.Section>
                 <Stack mt="md" gap="xs">
                   <Group justify="space-between">
-                    <Title order={4}>{trip.title}</Title>
-                    <Badge color={trip.isPublic ? 'green' : 'gray'} leftSection={trip.isPublic ? <Eye size={12} /> : null}>
-                      {trip.isPublic ? 'Public' : 'Private'}
+                    <Title order={4} style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {trip.title}
+                    </Title>
+                    <Badge color={trip.is_published ? 'green' : 'orange'} leftSection={trip.is_published ? <Eye size={12} /> : <Edit size={12} />}>
+                      {trip.is_published ? 'Published' : 'Draft'}
                     </Badge>
                   </Group>
                   <Group gap="xs">
                     <MapPin size={14} />
-                    <Text size="sm" c="dimmed">{trip.region}, {trip.country}</Text>
+                    <Text size="sm" c="dimmed">{trip.location}</Text>
                   </Group>
                   <Group gap="xs">
                     <Calendar size={14} />
-                    <Text size="sm" c="dimmed">{new Date(trip.createdAt).toLocaleDateString()}</Text>
+                    <Text size="sm" c="dimmed" lineClamp={1}>
+                      {formatDateRange(trip.earliestDate, trip.latestDate)}
+                    </Text>
                   </Group>
                   <Group gap="xs">
                     <Upload size={14} />
-                    <Text size="sm" c="dimmed">{trip.images?.length || 0} photos</Text>
+                    <Text size="sm" c="dimmed">{trip.photosCount} photos</Text>
                   </Group>
                 </Stack>
                 <Group mt="md" gap="xs">
-                  {!trip.images || trip.images.length === 0 ? (
-                    <Button component={Link} to={`/get-started-upload`} flex={1} size="sm">
-                      Upload Photos
-                    </Button>
-                  ) : trip.blogContent ? (
-                    <Button component={Link} to={`/trip/${trip.id}`} flex={1} size="sm">
+                  {trip.is_published ? (
+                    <Button component={Link} to={`/trip/${trip.slug}`} flex={1} size="sm" color="green">
                       View Story
                     </Button>
+                  ) : trip.photosCount > 0 ? (
+                    <Button component={Link} to={`/trip/${trip.slug}`} flex={1} size="sm" color="orange">
+                      Edit Draft
+                    </Button>
                   ) : (
-                    <Button component={Link} to={`/trip/${trip.id}/generate`} flex={1} size="sm" color="orange">
-                      Generate Blog
+                    <Button component={Link} to={`/get-started-upload`} flex={1} size="sm">
+                      Start Uploading
                     </Button>
                   )}
-                  <ActionIcon color="red" variant="light" size="lg" onClick={() => { if (confirm('Delete this trip?')) deleteTrip(trip.id); }}>
+                  <ActionIcon color="red" variant="light" size="lg" onClick={() => handleDelete(trip.id)}>
                     <Trash2 size={16} />
                   </ActionIcon>
                 </Group>

@@ -15,3 +15,7 @@ export const generateTripStory = (slug) => {
 export const publishTripStory = (slug, draftData) => {
   return api.put(`/trips/${slug}/publish`, draftData);
 };
+
+export const getMyTrips = () => {
+  return api.get('/trips/my/all');
+};

@@ -1,6 +1,72 @@
 const TripModel = require('../models/trip.model');
 const UploadedPictureModel = require('../models/uploadedPicture.model');
 
+async function getMyTrips(req, res, next) {
+  try {
+    const jwt = require('jsonwebtoken');
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
+    
+    let userId;
+    try {
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      userId = decoded.id;
+    } catch(e) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    const trips = await TripModel.getByUser(userId);
+    
+    const enhancedTrips = await Promise.all(trips.map(async (trip) => {
+      const pictures = await UploadedPictureModel.getByTripId(trip.id);
+      
+      let coverImage = pictures.length > 0 ? pictures[0].url : null;
+      let earliestDate = null;
+      let latestDate = null;
+      let location = "Unknown";
+      
+      if (pictures.length > 0) {
+         const validDates = pictures.map(p => new Date(p.date_taken)).filter(d => !isNaN(d.getTime()));
+         if (validDates.length > 0) {
+            validDates.sort((a,b) => a - b);
+            earliestDate = validDates[0];
+            latestDate = validDates[validDates.length - 1];
+         }
+         
+         const locCounts = {};
+         pictures.forEach(p => {
+           if (p.city || p.country) {
+             const key = [p.city, p.country].filter(Boolean).join(', ');
+             locCounts[key] = (locCounts[key] || 0) + 1;
+           }
+         });
+         
+         let maxCount = 0;
+         for (const [loc, count] of Object.entries(locCounts)) {
+            if (count > maxCount) {
+               maxCount = count;
+               location = loc;
+            }
+         }
+      }
+
+      return {
+        ...trip,
+        coverImage,
+        earliestDate,
+        latestDate,
+        location,
+        photosCount: pictures.length
+      };
+    }));
+
+    res.status(200).json({ success: true, trips: enhancedTrips });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function getTripBySlug(req, res, next) {
   try {
     const trip = await TripModel.getBySlug(req.params.slug);
@@ -94,4 +160,4 @@ async function publishTripStory(req, res, next) {
   }
 }
 
-module.exports = { getTripBySlug, updateTripTitle, generateTripStory, publishTripStory };
+module.exports = { getTripBySlug, updateTripTitle, generateTripStory, publishTripStory, getMyTrips };

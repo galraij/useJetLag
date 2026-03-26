@@ -9,6 +9,14 @@ const TripModel = {
     return rows[0];
   },
 
+  async getByUser(userId) {
+    const { rows } = await pool.query(
+      `SELECT * FROM trips WHERE user_id = $1 ORDER BY id DESC`,
+      [userId]
+    );
+    return rows;
+  },
+
   async getBySlug(slug) {
     const { rows } = await pool.query(
       `SELECT trips.*, users.name as user_name FROM trips LEFT JOIN users ON trips.user_id = users.id WHERE trips.slug = $1`,
