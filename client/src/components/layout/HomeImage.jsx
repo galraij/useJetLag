@@ -41,7 +41,6 @@ export default function HomeImage() {
                             color="orange"
                             component={Link}
                             to="/trip"
-                            //to="/get-started-upload"
                             rightSection={<Sparkles size={20} />}
                         >
                             Get Started Free
