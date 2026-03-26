@@ -1,7 +1,17 @@
 import HomeImage from "../components/layout/HomeImage";
-import HowItWorks from "../components/layout/HowItWorks";
+import Home from "../components/../pages/Home";
 
-export default function EomePage() {
-    return <><HomeImage /><HowItWorks /></>
-        ;
-}
+
+const HomePage = () => {
+  return (
+  <>
+<HomeImage/> 
+<Home/>
+  </>
+  );
+};
+
+export default HomePage;
+
+
+

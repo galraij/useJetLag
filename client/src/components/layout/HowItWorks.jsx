@@ -1,7 +1,6 @@
 import React from "react";
 import FeatureCard from "./FeatureCard";
-import "../../CSS/howItWorks.css";
-
+import "../../CSS/HowItWorks.css";
 
 import { Camera, Sparkles, Globe2 } from "lucide-react";
 

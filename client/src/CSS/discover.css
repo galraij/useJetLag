@@ -1,0 +1,53 @@
+.discover {
+  background: white;
+  padding: 60px 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+.header h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.header p {
+  color: #4b5563;
+  margin-top: 5px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 300px); /* ثابت */
+  gap: 30px;
+  justify-content: center; /* يخليهم بالنص */
+  margin-top: 40px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+.view-all-container {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.view-all-btn {
+  background: none;
+  border: none;
+  color: #4fa3d1;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.view-all-btn:hover {
+  color: #3d8bb8;
+}
