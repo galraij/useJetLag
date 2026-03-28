@@ -4,6 +4,7 @@ import { Container, Title, Text, Button, Grid, Card, Image, Badge, Group, Stack,
 import { Plus, MapPin, Calendar, Upload, Eye, Trash2, Edit } from 'lucide-react';
 import { getMyTrips } from '../api/trips.api';
 import useAuth from '../hooks/useAuth';
+import '../CSS/TripCard.css';
 
 export default function TripsPage() {
   const [userTrips, setUserTrips] = useState([]);
@@ -96,8 +97,8 @@ export default function TripsPage() {
         <Grid>
           {userTrips.map(trip => (
             <Grid.Col key={trip.id} span={{ base: 12, sm: 6, lg: 4 }}>
-              <Card withBorder radius="lg" shadow="sm" h="100%">
-                <Card.Section>
+              <Card className="trip-card" withBorder radius="lg" shadow="sm" h="100%">
+                <Card.Section style={{ overflow: 'hidden' }}>
                   <AspectRatio ratio={16 / 9}>
                     <Image src={trip.coverImage} alt={trip.title} fallbackSrc="https://placehold.co/400x225?text=No+Image" />
                   </AspectRatio>
