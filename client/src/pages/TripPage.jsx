@@ -287,46 +287,47 @@ export default function TripPage() {
             {pois.length > 0 && (
               <Card shadow="sm" p="lg" radius="md" withBorder style={{ position: 'sticky', top: '20px' }}>
                 <Title order={4} mb="md">Key Highlights</Title>
-                <List
-                  spacing="lg" size="sm"
-                  icon={
-                    <ThemeIcon color="orange" size={24} radius="xl" mt={4}>
-                      <MapPin size={14} />
-                    </ThemeIcon>
-                  }
-                >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   {pois.map((poi, idxPoi) => (
-                    <List.Item key={idxPoi}>
-                      <Group justify="flex-start" align="flex-start" wrap="nowrap" gap="xs">
-                        {!isPub && (
-                          <ActionIcon size="sm" color="red" variant="subtle" mt={2} onClick={() => {
-                            setTrip({ ...trip, points_of_interest: pois.filter((_, i) => i !== idxPoi) });
-                          }}>
-                            <X size={16} />
-                          </ActionIcon>
-                        )}
-                        <Box style={{ flex: 1 }}>
+                    <div key={idxPoi} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', width: '100%' }}>
+                      <ThemeIcon color="orange" size={24} radius="xl" mt={4} style={{ flexShrink: 0 }}>
+                        <MapPin size={14} />
+                      </ThemeIcon>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                        <Group justify="space-between" align="flex-start" wrap="nowrap" style={{ width: '100%' }}>
                           <TextInput 
+                            w="100%"
                             variant="unstyled" fw="bold" value={poi.name} readOnly={isPub}
                             onChange={(e) => {
                               const newPois = [...pois];
                               newPois[idxPoi].name = e.currentTarget.value;
                               setTrip({ ...trip, points_of_interest: newPois });
                             }}
+                            styles={{ input: { padding: 0 } }}
                           />
-                          <Textarea
-                            autosize variant="unstyled" size="xs" c="dimmed" value={poi.description} readOnly={isPub}
-                            onChange={(e) => {
-                              const newPois = [...pois];
-                              newPois[idxPoi].description = e.currentTarget.value;
-                              setTrip({ ...trip, points_of_interest: newPois });
-                            }}
-                          />
-                        </Box>
-                      </Group>
-                    </List.Item>
+                          {!isPub && (
+                            <ActionIcon size="sm" color="red" variant="subtle" onClick={() => {
+                              setTrip({ ...trip, points_of_interest: pois.filter((_, i) => i !== idxPoi) });
+                            }}>
+                              <X size={16} />
+                            </ActionIcon>
+                          )}
+                        </Group>
+                        <Textarea
+                          w="100%"
+                          autosize variant="unstyled" size="sm" c="dimmed" value={poi.description} readOnly={isPub}
+                          onChange={(e) => {
+                            const newPois = [...pois];
+                            newPois[idxPoi].description = e.currentTarget.value;
+                            setTrip({ ...trip, points_of_interest: newPois });
+                          }}
+                          styles={{ input: { padding: 0, lineHeight: 1.5 } }}
+                        />
+                      </div>
+                    </div>
                   ))}
-                </List>
+                </div>
               </Card>
             )}
           </Grid.Col>
