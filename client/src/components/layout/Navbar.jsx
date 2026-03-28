@@ -7,7 +7,7 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <Group justify="space-between" p="md" style={{ borderBottom: '1px solid #eee' }}>
+    <Group justify="space-between" p="md" style={{ borderBottom: '1px solid #eee', position: 'sticky', top: 0, zIndex: 1000, backgroundColor: 'white' }}>
       <Text fw={700} size="lg" component={Link} to="/" style={{ textDecoration: 'none' }}>
         useJetLag ✈️
       </Text>
