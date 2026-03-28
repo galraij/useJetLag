@@ -29,7 +29,10 @@ const DiscoverTrips = () => {
         <div className="grid">
           {trips.map((trip) => (
             <Link to={`/trip/${trip.slug}`} key={trip.id} style={{ textDecoration: 'none' }}>
-              <TripCard trip={trip} />
+              <TripCard 
+                trip={trip} 
+                onTripDeleted={(id) => setTrips(prev => prev.filter(t => t.id !== id))} 
+              />
             </Link>
           ))}
         </div>

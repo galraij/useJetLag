@@ -81,7 +81,10 @@ export default function Explore() {
     <div className="trip-grid">
       {filteredTrips.map(trip => (
         <Link to={`/trip/${trip.slug}`} key={trip.id} style={{ textDecoration: 'none' }}>
-          <TripCard trip={trip} />
+          <TripCard 
+            trip={trip} 
+            onTripDeleted={(id) => setPublicTrips(prev => prev.filter(t => t.id !== id))} 
+          />
         </Link>
       ))}
     </div>

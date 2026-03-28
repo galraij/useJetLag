@@ -1,7 +1,39 @@
 import "../../CSS/TripCard.css"
-const TripCard = ({ trip }) => {
+import useAuth from "../../hooks/useAuth";
+import { ActionIcon } from "@mantine/core";
+import { Trash } from "lucide-react";
+import { deleteTrip } from "../../api/trips.api";
+
+const TripCard = ({ trip, onTripDeleted }) => {
+  const { user } = useAuth();
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm("Admin: Permanently delete this trip from the system?")) return;
+    try {
+      await deleteTrip(trip.id);
+      if (onTripDeleted) onTripDeleted(trip.id);
+    } catch (err) {
+      console.error("Failed to delete trip:", err);
+      alert("Failed to delete trip");
+    }
+  };
+
   return (
-    <div className="trip-card">
+    <div className="trip-card" style={{ position: 'relative' }}>
+      {user?.role === 'admin' && (
+        <ActionIcon 
+          color="red" 
+          variant="filled" 
+          size="md"
+          title="Admin Delete"
+          style={{ position: 'absolute', top: 10, right: 10, zIndex: 100 }}
+          onClick={handleDelete}
+        >
+          <Trash size={16} />
+        </ActionIcon>
+      )}
 
       <div className="image-wrapper">
         <img src={trip.image} alt={trip.title} />

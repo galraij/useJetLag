@@ -161,7 +161,7 @@ export default function TripPage() {
 
   return (
     <Container pt="xl" size="xl">
-      {isLoggedIn && user && trip.user_id === user.id && trip.is_published && (
+      {isLoggedIn && user && (trip.user_id === user.id || user.role === 'admin') && trip.is_published && (
         <Group justify="flex-end" mb="md">
           <Button variant="light" onClick={() => setIsEditingMode(!isEditingMode)}>
             {isEditingMode ? 'Cancel Edit' : 'Edit Trip'}

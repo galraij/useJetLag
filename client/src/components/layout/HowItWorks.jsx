@@ -30,7 +30,7 @@ export default function HowItWorks() {
         <FeatureCard
           icon={<Globe2 size={32} />}
           title="Share & Explore"
-          description="Share your story or keep it private, explore others' adventures"
+          description="Share your story or explore others' adventures"
           colorClass="beige"
         />
       </div>

@@ -138,7 +138,8 @@ async function publishTripStory(req, res, next) {
     const newSlug = trip.title === title ? slug : title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now();
     
     // Update Title & Story
-    await TripModel.update(trip.id, { title, slug: newSlug, userId });
+    const activeUserId = trip.is_published ? null : userId;
+    await TripModel.update(trip.id, { title, slug: newSlug, userId: activeUserId });
     await TripModel.updateStory(trip.id, { story_summary, points_of_interest, is_published: true });
 
     // Fetch the fresh full record containing joined users table (user_name)
