@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 //import HomeImage from './components/layout/HomeImage';
@@ -17,7 +18,60 @@ import TripPage from './pages/TripPage';
 import TripsPage from './pages/TripsPage';
 import Explore from "./pages/Explore";
 import Dashboard from "./pages/Dashboard";
+import { supabase } from './lib/supabaseClient';
+import { useAuthStore } from './store/authStore';
+
 export default function App() {
+  const { setAuth, logout, setInitialized } = useAuthStore();
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function syncProfile(session) {
+      if (!session) {
+        logout();
+        if (mounted) setInitialized(true);
+        return;
+      }
+
+      try {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (mounted) {
+          if (profile) {
+            setAuth(profile, session.access_token);
+          } else {
+            setAuth({ id: session.user.id, email: session.user.email, role: 'user' }, session.access_token);
+          }
+        }
+      } catch (err) {
+        console.error("Profile sync failed:", err);
+        if (mounted) setAuth({ id: session.user.id, email: session.user.email, role: 'user' }, session.access_token);
+      } finally {
+        if (mounted) setInitialized(true);
+      }
+    }
+
+    // 1. Check for initial session immediately
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (mounted) syncProfile(session);
+    });
+
+    // 2. Listen for all auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (mounted) syncProfile(session);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [setAuth, logout, setInitialized]);
+
   return (
     <BrowserRouter>
 

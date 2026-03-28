@@ -9,6 +9,7 @@
   "dependencies": {
     "@mantine/core": "^7.0.0",
     "@mantine/hooks": "^7.0.0",
+    "@supabase/supabase-js": "^2.100.1",
     "@tabler/icons-react": "^2.0.0",
     "axios": "^1.6.0",
     "exifr": "^7.1.3",

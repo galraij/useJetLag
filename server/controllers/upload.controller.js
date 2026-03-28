@@ -23,16 +23,16 @@ async function uploadWithExif(req, res, next) {
   try {
     if (!req.files?.length) return uploadView.noFiles(res);
 
-    const jwt = require('jsonwebtoken');
-    let userId = null;
-    const authHeader = req.headers.authorization;
-    if (authHeader) {
-      try {
-        const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        userId = decoded.id;
-      } catch (err) { console.error('Token parsing failed:', err.message); }
-    }
+      const { verifySupabaseToken } = require('../utils/jwt.utils');
+      let userId = null;
+      const authHeader = req.headers.authorization;
+      if (authHeader) {
+        try {
+          const token = authHeader.split(' ')[1];
+          const user = await verifySupabaseToken(token);
+          userId = user.id;
+        } catch (err) { console.error('Token parsing failed:', err.message); }
+      }
 
     const tripSlug = `trip1-${Date.now()}`;
     const newTrip = await TripModel.create({ title: 'trip1', slug: tripSlug, userId });

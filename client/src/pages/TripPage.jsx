@@ -46,6 +46,8 @@ export default function TripPage() {
               setTrip(data.trip);
               setPictures(data.pictures || []);
               setLoading(false);
+              // After auto-publishing from login, take user to the live story
+              navigate(`/trip/${data.trip.slug}`, { replace: true });
               return; // Skip normal fetch, we got the fresh published data
             }
           } catch (err) {
@@ -73,10 +75,12 @@ export default function TripPage() {
     if (slug) {
       fetchData();
     }
-  }, [slug]);
+  }, [slug, isLoggedIn]);
 
   async function handleDeletePicture(id) {
-    if (trip.is_published) return;
+    // Block delete only when the trip is published AND we're not actively editing it
+    if (trip.is_published && !isEditingMode) return;
+
     try {
       await deletePicture(id);
       setPictures(prev => prev.filter(p => p.id !== id));
@@ -138,6 +142,7 @@ export default function TripPage() {
       setTrip(data.trip);
       setPictures(data.pictures || []);
       setIsEditingMode(false);
+      // Show the published story immediately
       navigate(`/trip/${data.trip.slug}`, { replace: true });
     } catch (err) {
       console.error(err);

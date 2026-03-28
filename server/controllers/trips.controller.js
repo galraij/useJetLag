@@ -3,16 +3,17 @@ const UploadedPictureModel = require('../models/uploadedPicture.model');
 
 async function getMyTrips(req, res, next) {
   try {
-    const jwt = require('jsonwebtoken');
+    const { verifySupabaseToken } = require('../utils/jwt.utils');
     const authHeader = req.headers.authorization;
     if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
     
     let userId;
     try {
       const token = authHeader.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      userId = decoded.id;
+      const user = await verifySupabaseToken(token);
+      userId = user.id;
     } catch(e) {
+      console.error('JWT verification failed:', e.message);
       return res.status(401).json({ error: 'Invalid token' });
     }
 
@@ -117,14 +118,14 @@ async function generateTripStory(req, res, next) {
 
 async function publishTripStory(req, res, next) {
   try {
-    const jwt = require('jsonwebtoken');
+    const { verifySupabaseToken } = require('../utils/jwt.utils');
     let userId = null;
     const authHeader = req.headers.authorization;
     if (authHeader) {
       try {
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        userId = decoded.id;
+        const user = await verifySupabaseToken(token);
+        userId = user.id;
       } catch (err) { console.error('Token extraction failed', err); }
     }
 
@@ -227,15 +228,16 @@ async function getLatestPublishedTrips(req, res, next) {
 
 async function deleteTrip(req, res, next) {
   try {
-    const jwt = require('jsonwebtoken');
+    const { verifySupabaseToken } = require('../utils/jwt.utils');
     const authHeader = req.headers.authorization;
     if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
     let userId;
     try {
       const token = authHeader.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      userId = decoded.id;
+      const user = await verifySupabaseToken(token);
+      userId = user.id;
     } catch(e) {
+      console.error('JWT verification failed:', e.message);
       return res.status(401).json({ error: 'Invalid token' });
     }
 

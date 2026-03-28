@@ -1,11 +1,13 @@
 import "../../CSS/TripCard.css"
 import useAuth from "../../hooks/useAuth";
 import { ActionIcon } from "@mantine/core";
-import { Trash } from "lucide-react";
+import { Trash, Edit } from "lucide-react";
 import { deleteTrip } from "../../api/trips.api";
+import { Link } from "react-router-dom";
 
 const TripCard = ({ trip, onTripDeleted }) => {
   const { user } = useAuth();
+  const isOwner = user && trip.user_id === user.id;
 
   const handleDelete = async (e) => {
     e.preventDefault();
@@ -32,6 +34,21 @@ const TripCard = ({ trip, onTripDeleted }) => {
           onClick={handleDelete}
         >
           <Trash size={16} />
+        </ActionIcon>
+      )}
+
+      {isOwner && (
+        <ActionIcon 
+          component={Link}
+          to={`/trip/${trip.slug}`}
+          color="blue" 
+          variant="filled" 
+          size="md"
+          title="Edit Trip"
+          style={{ position: 'absolute', top: 10, left: 10, zIndex: 100 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Edit size={16} />
         </ActionIcon>
       )}
 

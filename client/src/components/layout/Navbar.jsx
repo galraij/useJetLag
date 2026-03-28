@@ -20,7 +20,7 @@ export default function Navbar() {
         {user?.role === 'admin' && <Button variant="subtle" component={Link} to="/admin">Admin</Button>}
         {isLoggedIn
           ? <Button variant="outline" onClick={() => { logout(); navigate('/'); }}>Logout</Button>
-          : <Button component={Link} to="/login">Sign Up</Button>
+          : <Button component={Link} to="/register">Sign Up</Button>
         }
       </Group>
     </Group>

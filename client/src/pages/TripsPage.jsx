@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Title, Text, Button, Grid, Card, Image, Badge, Group, Stack, AspectRatio, ActionIcon, Loader, Center } from '@mantine/core';
-import { Plus, MapPin, Calendar, Upload, Eye, Trash2, Edit } from 'lucide-react';
+import { Container, Title, Text, Button, Grid, Card, Image, Group, Stack, AspectRatio, ActionIcon, Loader, Center } from '@mantine/core';
+import { Plus, MapPin, Calendar, Upload, Trash2 } from 'lucide-react';
 import { getMyTrips } from '../api/trips.api';
 import useAuth from '../hooks/useAuth';
 import '../CSS/TripCard.css';
@@ -9,10 +9,11 @@ import '../CSS/TripCard.css';
 export default function TripsPage() {
   const [userTrips, setUserTrips] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isInitialized } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!isInitialized) return; // Wait for session hydration
     if (!isLoggedIn) {
       navigate('/login');
       return;
@@ -32,7 +33,7 @@ export default function TripsPage() {
     }
 
     fetchTrips();
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, isInitialized, navigate]);
 
   const handleDelete = async (id) => {
     if (confirm('Are you sure you want to permanently delete this trip and all its photos?')) {
@@ -105,12 +106,9 @@ export default function TripsPage() {
                 </Card.Section>
                 <Stack mt="md" gap="xs">
                   <Group justify="space-between">
-                    <Title order={4} style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <Title order={4}>
                       {trip.title}
                     </Title>
-                    <Badge color={trip.is_published ? 'green' : 'orange'} leftSection={trip.is_published ? <Eye size={12} /> : <Edit size={12} />}>
-                      {trip.is_published ? 'Published' : 'Draft'}
-                    </Badge>
                   </Group>
                   <Group gap="xs">
                     <MapPin size={14} />
@@ -130,15 +128,11 @@ export default function TripsPage() {
                 <Group mt="md" gap="xs">
                   {trip.is_published ? (
                     <Button component={Link} to={`/trip/${trip.slug}`} flex={1} size="sm" color="green">
-                      View Story
-                    </Button>
-                  ) : trip.photosCount > 0 ? (
-                    <Button component={Link} to={`/trip/${trip.slug}`} flex={1} size="sm" color="orange">
-                      Edit Draft
+                      View Trip
                     </Button>
                   ) : (
-                    <Button component={Link} to={`/get-started-upload`} flex={1} size="sm">
-                      Start Uploading
+                    <Button component={Link} to={`/trip/${trip.slug}`} flex={1} size="sm" color="orange">
+                      {trip.photosCount > 0 ? 'Edit Draft' : 'Add Photos'}
                     </Button>
                   )}
                   <ActionIcon color="red" variant="light" size="lg" onClick={() => handleDelete(trip.id)}>
