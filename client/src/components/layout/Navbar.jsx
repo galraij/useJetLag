@@ -14,8 +14,8 @@ export default function Navbar() {
       <Group>
         <Button variant="subtle" component={Link} to="/explore">Explore</Button>
         {!isLoggedIn && <Button variant="subtle" component={Link} to="/login" >Login</Button>}
-        {isLoggedIn && <Button variant="subtle" component={Link} to="/trip">My Trips</Button>}
-        {isLoggedIn && <Button variant="subtle" component={Link} to="/get-started-upload">New Trip</Button>}
+        {isLoggedIn && <Button variant="subtle" component={Link} to="/my-feed">My Trips</Button>}
+        {isLoggedIn && <Button variant="subtle" component={Link} to="/upload">New Trip</Button>}
 
         {user?.role === 'admin' && <Button variant="subtle" component={Link} to="/admin">Admin</Button>}
         {isLoggedIn
