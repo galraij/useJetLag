@@ -10,7 +10,7 @@ import useAuth from '../hooks/useAuth';
 export default function TripPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
   
   const [trip, setTrip] = useState({});
   const [pictures, setPictures] = useState([]);
@@ -18,6 +18,7 @@ export default function TripPage() {
   const [generating, setGenerating] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [isDraft, setIsDraft] = useState(false);
+  const [isEditingMode, setIsEditingMode] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -136,6 +137,7 @@ export default function TripPage() {
       const { data } = await publishTripStory(slug, payload);
       setTrip(data.trip);
       setPictures(data.pictures || []);
+      setIsEditingMode(false);
       navigate(`/trip/${data.trip.slug}`, { replace: true });
     } catch (err) {
       console.error(err);
@@ -155,10 +157,18 @@ export default function TripPage() {
     idx += size;
   }
 
-  const isPub = trip.is_published;
+  const isPub = trip.is_published && !isEditingMode;
 
   return (
     <Container pt="xl" size="xl">
+      {isLoggedIn && user && trip.user_id === user.id && trip.is_published && (
+        <Group justify="flex-end" mb="md">
+          <Button variant="light" onClick={() => setIsEditingMode(!isEditingMode)}>
+            {isEditingMode ? 'Cancel Edit' : 'Edit Trip'}
+          </Button>
+        </Group>
+      )}
+
       {trip.title && trip.title !== 'trip1' && (
         <Center style={{ flexDirection: 'column' }} mb="xl">
           <Textarea
@@ -331,7 +341,7 @@ export default function TripPage() {
             </Button>
           ) : (
             <Button onClick={handlePublish} loading={publishing} leftSection={<Check size={16} />} color="green" size="lg">
-              Publish My Trip
+              {isEditingMode ? 'Save Changes' : 'Publish My Trip'}
             </Button>
           )}
         </Center>
