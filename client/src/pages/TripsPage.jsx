@@ -33,12 +33,15 @@ export default function TripsPage() {
     fetchTrips();
   }, [isLoggedIn, navigate]);
 
-  const handleDelete = (id) => {
-    // Note: Backend deletion endpoint would need to be implemented for this to actually delete it
-    // For now, we update local state
-    if (confirm('Delete this trip?')) {
-      setUserTrips(prev => prev.filter(t => t.id !== id));
-      alert("Delete function coming soon!");
+  const handleDelete = async (id) => {
+    if (confirm('Are you sure you want to permanently delete this trip and all its photos?')) {
+      try {
+        await import('../api/trips.api').then(m => m.deleteTrip(id));
+        setUserTrips(prev => prev.filter(t => t.id !== id));
+      } catch (err) {
+        console.error("Failed to delete trip:", err);
+        alert("Failed to delete trip.");
+      }
     }
   };
 

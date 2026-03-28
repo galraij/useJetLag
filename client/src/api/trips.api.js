@@ -19,3 +19,11 @@ export const publishTripStory = (slug, draftData) => {
 export const getMyTrips = () => {
   return api.get('/trips/my/all');
 };
+
+export const getLatestPublishedTrips = (limit = 6) => {
+  return api.get(`/trips/published/latest?limit=${limit}`);
+};
+
+export const deleteTrip = (id) => {
+  return api.delete(`/trips/${id}`);
+};

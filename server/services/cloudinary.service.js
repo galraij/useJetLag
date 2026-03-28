@@ -16,4 +16,18 @@ async function uploadBuffer(buffer, filename) {
   });
 }
 
-module.exports = { uploadBuffer };
+async function deleteImage(url) {
+  if (!url) return;
+  const matches = url.match(/\/upload\/(?:v\d+\/)?(.+?)\.[^.]+$/);
+  if (matches && matches[1]) {
+    const publicId = matches[1];
+    return new Promise((resolve) => {
+      cloudinary.uploader.destroy(publicId, (err, result) => {
+        if (err) console.error("Cloudinary destroy error:", err);
+        resolve(result);
+      });
+    });
+  }
+}
+
+module.exports = { uploadBuffer, deleteImage };

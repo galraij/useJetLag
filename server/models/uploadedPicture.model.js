@@ -33,6 +33,15 @@ const UploadedPictureModel = {
     );
   },
 
+  async getById(id) {
+    const { rows } = await pool.query(`SELECT * FROM uploaded_pictures WHERE id = $1`, [id]);
+    return rows[0];
+  },
+
+  async deleteByTripId(tripId) {
+    await pool.query(`DELETE FROM uploaded_pictures WHERE trip_id = $1`, [tripId]);
+  },
+
   async deleteById(id) {
     await pool.query(`DELETE FROM uploaded_pictures WHERE id = $1`, [id]);
   }

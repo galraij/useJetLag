@@ -25,6 +25,14 @@ const TripModel = {
     return rows[0];
   },
 
+  async getLatestPublished(limit = 6) {
+    const { rows } = await pool.query(
+      `SELECT trips.*, users.name as user_name FROM trips LEFT JOIN users ON trips.user_id = users.id WHERE trips.is_published = true ORDER BY trips.id DESC LIMIT $1`,
+      [limit]
+    );
+    return rows;
+  },
+
   async update(id, { title, slug, userId }) {
     const query = userId 
       ? `UPDATE trips SET title = $1, slug = $2, user_id = COALESCE(user_id, $3) WHERE id = $4 RETURNING *`
@@ -40,6 +48,10 @@ const TripModel = {
       [story_summary, JSON.stringify(points_of_interest), is_published, id]
     );
     return rows[0];
+  },
+  
+  async delete(id) {
+    await pool.query(`DELETE FROM trips WHERE id = $1`, [id]);
   }
 };
 

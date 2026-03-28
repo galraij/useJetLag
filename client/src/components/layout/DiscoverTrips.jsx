@@ -1,13 +1,20 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import TripCard from "./TripCard";
 import "../../CSS/discover.css";
+import { getLatestPublishedTrips } from "../../api/trips.api";
+
 const DiscoverTrips = () => {
   const [trips, setTrips] = useState([]);
 
   useEffect(() => {
-    fetch("/trips.json")
-      .then((res) => res.json())
-      .then((data) => setTrips(data));
+    getLatestPublishedTrips(6)
+      .then((res) => {
+        if (res.data.success) {
+          setTrips(res.data.trips);
+        }
+      })
+      .catch((err) => console.error("Error fetching latest trips", err));
   }, []);
 
   return (
@@ -21,14 +28,18 @@ const DiscoverTrips = () => {
 
         <div className="grid">
           {trips.map((trip) => (
-            <TripCard key={trip.id} trip={trip} />
+            <Link to={`/trip/${trip.slug}`} key={trip.id} style={{ textDecoration: 'none' }}>
+              <TripCard trip={trip} />
+            </Link>
           ))}
         </div>
         <div className="view-all-container">
-  <button className="view-all-btn">
-    View All Trips →
-  </button>
-</div>
+          <Link to="/explore">
+            <button className="view-all-btn">
+              View All Trips →
+            </button>
+          </Link>
+        </div>
 
       </div>
     </section>

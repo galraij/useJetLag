@@ -22,8 +22,8 @@ const TripCard = ({ trip }) => {
       </div>
 
       <div className="card-footer">
-        <span>12 photos</span>
-        <span className="read">Read Story →</span>
+        <span className="author">By {trip.user_name || "Unknown user"}</span>
+        <span className="read">View Trip →</span>
       </div>
 
     </div>

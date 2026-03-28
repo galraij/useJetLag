@@ -104,6 +104,11 @@ async function uploadWithExif(req, res, next) {
 async function deletePicture(req, res, next) {
   try {
     const { id } = req.params;
+    const picture = await UploadedPictureModel.getById(id);
+    if (picture && picture.url) {
+       const { deleteImage } = require('../services/cloudinary.service');
+       await deleteImage(picture.url);
+    }
     await UploadedPictureModel.deleteById(id);
     res.status(200).json({ success: true });
   } catch (err) {

@@ -160,4 +160,99 @@ async function publishTripStory(req, res, next) {
   }
 }
 
-module.exports = { getTripBySlug, updateTripTitle, generateTripStory, publishTripStory, getMyTrips };
+async function getLatestPublishedTrips(req, res, next) {
+  try {
+    const limit = parseInt(req.query.limit) || 6;
+    const trips = await TripModel.getLatestPublished(limit);
+    
+    const enhancedTrips = await Promise.all(trips.map(async (trip) => {
+      const pictures = await UploadedPictureModel.getByTripId(trip.id);
+      
+      let coverImage = pictures.length > 0 ? pictures[0].url : null;
+      let location = "Unknown";
+      let displayDate = null;
+      
+      if (pictures.length > 0) {
+         const validDates = pictures.map(p => new Date(p.date_taken)).filter(d => !isNaN(d.getTime()));
+         if (validDates.length > 0) {
+            validDates.sort((a,b) => a - b);
+            displayDate = validDates[0];
+         }
+         
+         const locCounts = {};
+         pictures.forEach(p => {
+           if (p.city || p.country) {
+             const key = [p.city, p.country].filter(Boolean).join(', ');
+             locCounts[key] = (locCounts[key] || 0) + 1;
+           }
+         });
+         
+         let maxCount = 0;
+         for (const [loc, count] of Object.entries(locCounts)) {
+            if (count > maxCount) {
+               maxCount = count;
+               location = loc;
+            }
+         }
+      }
+
+      const locParts = location.split(', ');
+      
+      let formattedMonth = "Unknown";
+      let formattedYear = "";
+      if (displayDate) {
+         formattedMonth = displayDate.toLocaleString('default', { month: 'short' });
+         formattedYear = displayDate.getFullYear();
+      }
+
+      return {
+        id: trip.id,
+        slug: trip.slug,
+        title: trip.title,
+        image: coverImage || 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800',
+        region: locParts[0] || 'World',
+        country: locParts[1] || locParts[0] || 'Unknown',
+        month: formattedMonth,
+        year: formattedYear,
+        user_name: trip.user_name
+      };
+    }));
+
+    res.status(200).json({ success: true, trips: enhancedTrips });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function deleteTrip(req, res, next) {
+  try {
+    const jwt = require('jsonwebtoken');
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
+    let userId;
+    try {
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      userId = decoded.id;
+    } catch(e) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    const { id } = req.params;
+
+    const pictures = await UploadedPictureModel.getByTripId(id);
+    const { deleteImage } = require('../services/cloudinary.service');
+    for (const pic of pictures) {
+      await deleteImage(pic.url);
+    }
+    
+    await UploadedPictureModel.deleteByTripId(id);
+    await TripModel.delete(id);
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getTripBySlug, updateTripTitle, generateTripStory, publishTripStory, getMyTrips, getLatestPublishedTrips, deleteTrip };
