@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Container, Title, Loader, Center, Text, Button, Card, List, ThemeIcon, Grid, Box, SimpleGrid, TextInput, Textarea, ActionIcon, Group } from '@mantine/core';
 import { Sparkles, MapPin, X, Check } from 'lucide-react';
 import { getTripBySlug, generateTripStory, publishTripStory } from '../api/trips.api';
@@ -344,6 +344,14 @@ export default function TripPage() {
               {isEditingMode ? 'Save Changes' : 'Publish My Trip'}
             </Button>
           )}
+        </Center>
+      )}
+
+      {isPub && (
+        <Center mt="xl" pb="xl">
+          <Button component={Link} to="/trip" variant="outline" size="lg" color="gray">
+            Back to My Trips
+          </Button>
         </Center>
       )}
     </Container>
