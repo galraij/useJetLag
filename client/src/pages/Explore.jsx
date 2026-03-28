@@ -1,20 +1,31 @@
 import { Link } from "react-router-dom";
-import { useTravel } from "../context/TravelContext";
-import { MapPin, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Search } from "lucide-react";
+import TripCard from "../components/layout/TripCard";
+import { getLatestPublishedTrips } from "../api/trips.api";
 import "../CSS/explore.css";
-export default function Explore() {
-  const { publicTrips } = useTravel();
 
+export default function Explore() {
+  const [publicTrips, setPublicTrips] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [selectedRegion, setSelectedRegion] = useState("all");
 
-  const countries = [...new Set(publicTrips.map(t => t.country))];
+  useEffect(() => {
+    getLatestPublishedTrips(100)
+      .then((res) => {
+        if (res.data && res.data.success) {
+          setPublicTrips(res.data.trips);
+        }
+      })
+      .catch((err) => console.error("Error fetching trips:", err));
+  }, []);
+
+  const countries = [...new Set(publicTrips.map(t => t.country).filter(Boolean))];
   const regions =
     selectedCountry === "all"
-      ? [...new Set(publicTrips.map(t => t.region))]
-      : [...new Set(publicTrips.filter(t => t.country === selectedCountry).map(t => t.region))];
+      ? [...new Set(publicTrips.map(t => t.region).filter(Boolean))]
+      : [...new Set(publicTrips.filter(t => t.country === selectedCountry).map(t => t.region).filter(Boolean))];
 
   const filteredTrips = publicTrips.filter(trip => {
     if (selectedCountry !== "all" && trip.country !== selectedCountry) return false;
@@ -87,34 +98,8 @@ export default function Explore() {
     {/* GRID */}
     <div className="trip-grid">
       {filteredTrips.map(trip => (
-        <Link to={`/trip/${trip.id}`} key={trip.id} className="trip-card">
-
-          <div className="card-image">
-            <img src={trip.coverImage} alt={trip.title} />
-            <div className="overlay"></div>
-
-            <div className="card-content">
-              <div className="location">
-                <MapPin size={14} />
-                <span>{trip.region}, {trip.country}</span>
-              </div>
-
-              <h3>{trip.title}</h3>
-
-              <p className="date">
-                {new Date(trip.createdAt).toLocaleDateString("en-US", {
-                  month: "long",
-                  year: "numeric"
-                })}
-              </p>
-            </div>
-          </div>
-
-          <div className="card-footer">
-            <span>{trip.images.length} photos</span>
-            <span className="read">Read Story →</span>
-          </div>
-
+        <Link to={`/trip/${trip.slug}`} key={trip.id} style={{ textDecoration: 'none' }}>
+          <TripCard trip={trip} />
         </Link>
       ))}
     </div>
