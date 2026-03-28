@@ -8,7 +8,7 @@ const DiscoverTrips = () => {
   const [trips, setTrips] = useState([]);
 
   useEffect(() => {
-    getLatestPublishedTrips(6)
+    getLatestPublishedTrips(8)
       .then((res) => {
         if (res.data.success) {
           setTrips(res.data.trips);
