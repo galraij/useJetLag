@@ -46,7 +46,7 @@ export default function App() {
         <Route path="/explore" element={<Explore/>} />
 
 <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/get-started-upload" element={<Dashboard />} />
+        <Route path="/get-started-upload" element={<GetStartedUploadPage />} />
         <Route path="/trip/:slug" element={<TripPage />} />
         <Route path="/trip" element={<TripsPage />} />
 
