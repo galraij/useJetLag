@@ -9,7 +9,6 @@ export default function Explore() {
   const [publicTrips, setPublicTrips] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("all");
-  const [selectedRegion, setSelectedRegion] = useState("all");
 
   useEffect(() => {
     getLatestPublishedTrips(100)
@@ -22,15 +21,10 @@ export default function Explore() {
   }, []);
 
   const countries = [...new Set(publicTrips.map(t => t.country).filter(Boolean))];
-  const regions =
-    selectedCountry === "all"
-      ? [...new Set(publicTrips.map(t => t.region).filter(Boolean))]
-      : [...new Set(publicTrips.filter(t => t.country === selectedCountry).map(t => t.region).filter(Boolean))];
 
   const filteredTrips = publicTrips.filter(trip => {
     if (selectedCountry !== "all" && trip.country !== selectedCountry) return false;
-    if (selectedRegion !== "all" && trip.region !== selectedRegion) return false;
-    if (searchQuery && !trip.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    if (searchQuery && trip.title && !trip.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
   });
 
@@ -39,7 +33,7 @@ export default function Explore() {
 
     {/* HEADER */}
     <div className="explore-header">
-      <h1>Explore Travel Stories</h1>
+      <h1>Explore Trips</h1>
       <p>Discover amazing journeys from travelers around the world</p>
     </div>
 
@@ -57,21 +51,10 @@ export default function Explore() {
 
       <select
         value={selectedCountry}
-        onChange={(e) => {
-          setSelectedCountry(e.target.value);
-          setSelectedRegion("all");
-        }}
+        onChange={(e) => setSelectedCountry(e.target.value)}
       >
         <option value="all">All Countries</option>
         {countries.map(c => <option key={c}>{c}</option>)}
-      </select>
-
-      <select
-        value={selectedRegion}
-        onChange={(e) => setSelectedRegion(e.target.value)}
-      >
-        <option value="all">All Regions</option>
-        {regions.map(r => <option key={r}>{r}</option>)}
       </select>
     </div>
 
@@ -81,13 +64,12 @@ export default function Explore() {
         Showing {filteredTrips.length} {filteredTrips.length === 1 ? "trip" : "trips"}
       </span>
 
-      {(searchQuery || selectedCountry !== "all" || selectedRegion !== "all") && (
+      {(searchQuery || selectedCountry !== "all") && (
         <button
           className="clear-btn"
           onClick={() => {
             setSearchQuery("");
             setSelectedCountry("all");
-            setSelectedRegion("all");
           }}
         >
           Clear Filters
