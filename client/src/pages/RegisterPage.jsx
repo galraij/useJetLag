@@ -28,11 +28,15 @@ export default function RegisterPage() {
 
   async function handleRegister() {
     setErrorHeader("");
+    if (!name || !email || !password) {
+      setErrorHeader("Please fill in all fields.");
+      return;
+    }
     setIsRegistering(true);
     try {
       const res = await registerUser(email, password, name);
       if (res.user) {
-        navigate(from);
+        navigate(from, { replace: true });
       }
     } catch (err) {
       console.error(err);
@@ -40,6 +44,10 @@ export default function RegisterPage() {
     } finally {
       setIsRegistering(false);
     }
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') handleRegister();
   }
 
   return (
@@ -67,6 +75,7 @@ export default function RegisterPage() {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
 
         <TextInput
@@ -75,6 +84,7 @@ export default function RegisterPage() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
 
         <PasswordInput
@@ -83,6 +93,7 @@ export default function RegisterPage() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
 
         <Button

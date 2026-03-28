@@ -1,4 +1,4 @@
-/* الصفحة */
+/* Page */
 .explore-page {
   background: #f9fafb;
   min-height: 100vh;
@@ -6,7 +6,7 @@
   font-family: "Inter", sans-serif;
 }
 
-/* الهيدر */
+/* Header */
 .explore-header {
   text-align: center;
   margin-bottom: 30px;
@@ -20,10 +20,12 @@
 }
 
 .explore-header p {
-  color: #6b7280;
+  color: #374151; /* was #6b7280 — improved readability */
+  font-size: 16px;
+  font-weight: 500;
 }
 
-/* search */
+/* Search */
 .explore-search {
   background: white;
   padding: 20px;
@@ -34,6 +36,7 @@
   max-width: 800px;
   margin: 0 auto 30px auto;
   border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
 .search-input {
@@ -41,60 +44,120 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d1d5db;
   padding: 10px;
   border-radius: 10px;
-
 }
 
 .search-input input {
   border: none;
   outline: none;
   width: 100%;
- background-color: white !important;
+  background-color: white !important;
+  font-size: 14px;
+  color: #111827;
+}
 
+.search-input input::placeholder {
+  color: #6b7280;
 }
 
 select {
-  padding: 10px;
+  padding: 10px 14px;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d1d5db;
   background-color: white !important;
-  color: black;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Info row — sits directly above the grid */
+.explore-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  margin: 0 auto 16px auto;
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+  text-align: center;
+}
+
+.explore-info strong {
+  color: #111827;
+}
+
+/* Clear button */
+.clear-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.clear-btn:hover {
+  background: #eff6ff;
+  text-decoration: underline;
 }
 
 /* GRID */
 .trip-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 300px);
+  grid-template-columns: repeat(auto-fit, 300px);
   gap: 30px;
   justify-content: center;
-  max-width: 1620px; /* 5 cards * 300px + 4 gaps * 30px = 1620px */
+  max-width: 1620px;
   margin: 0 auto;
 }
 
+/* ─── SKELETON LOADING ──────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
 
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 8px;
+}
 
-/* info row */
-.explore-info {
+.skeleton-card {
+  width: 300px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.skeleton-img {
+  width: 100%;
+  height: 180px;
+}
+
+.skeleton-body {
+  padding: 16px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1620px;
-  margin: 10px auto 20px auto;
-  font-size: 14px;
-  color: #6b7280;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* clear button */
-.clear-btn {
-  background: none;
-  border: none;
-  color: #4DA8DA;
-  font-weight: 600;
-  cursor: pointer;
+.skeleton-line {
+  height: 14px;
+  border-radius: 6px;
 }
 
-.clear-btn:hover {
-  text-decoration: underline;
-}
+.skeleton-line.wide   { width: 85%; }
+.skeleton-line.medium { width: 60%; }
+.skeleton-line.narrow { width: 40%; }

@@ -30,28 +30,24 @@ export default function TripPage() {
           try {
             const { trip: savedTrip, pictures: savedPictures } = JSON.parse(pendingDataStr);
             if (savedTrip.slug === slug) {
-              const payload = {
-                title: savedTrip.title,
-                story_summary: savedTrip.story_summary,
-                points_of_interest: savedTrip.points_of_interest,
-                pictures: savedPictures.map(p => ({
-                  id: p.id,
-                  punchy_description: p.punchy_description,
-                  story_segment: p.story_segment
-                }))
+              // Restore the edited draft state so the user can review and click Publish
+              // Works for both existing-user login AND new-user registration flows
+              const restoredTrip = {
+                ...savedTrip,
+                points_of_interest: typeof savedTrip.points_of_interest === 'string'
+                  ? JSON.parse(savedTrip.points_of_interest)
+                  : (savedTrip.points_of_interest || [])
               };
-              const { data } = await publishTripStory(slug, payload);
               localStorage.removeItem('pendingTripPublish');
-              
-              setTrip(data.trip);
-              setPictures(data.pictures || []);
+              setTrip(restoredTrip);
+              setPictures(savedPictures);
+              if (restoredTrip.story_summary) setIsDraft(true);
               setLoading(false);
-              // After auto-publishing from login, take user to the live story
-              navigate(`/trip/${data.trip.slug}`, { replace: true });
-              return; // Skip normal fetch, we got the fresh published data
+              return; // Skip normal fetch — restored from pending draft
             }
           } catch (err) {
-            console.error("Auto publish failed", err);
+            console.error("Draft restore failed", err);
+            localStorage.removeItem('pendingTripPublish');
           }
         }
 

@@ -55,7 +55,7 @@ export default function LoginPage() {
       </Title>
       <Text c="dimmed" size="sm" ta="center" mb="xl">
         Don't have an account?{" "}
-        <Anchor component={Link} to="/register" size="sm">
+        <Anchor component={Link} to="/register" state={{ from }} size="sm">
           Create one
         </Anchor>
       </Text>
