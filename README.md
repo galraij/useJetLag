@@ -116,3 +116,36 @@ server/
 | GET | /admin/users | Admin | רשימת משתמשים |
 | DELETE | /admin/posts/:id | Admin | מחיקה כ-Admin |
 | PATCH | /admin/users/:id/block | Admin | חסימת משתמש |
+
+---
+
+## 🚀 Deployment (GitHub-Linked)
+
+This project is optimized for deployment using **Vercel** (Frontend) and **Render** (Backend).
+
+### 1. Backend (Render)
+1. Create a "Web Service" on [Render](https://render.com).
+2. Connect this GitHub repository.
+3. **Root Directory**: `server`
+4. **Build Command**: `npm install`
+5. **Start Command**: `npm start`
+6. **Environment Variables**:
+   - `DB_URL`: Your Supabase/PostgreSQL connection string.
+   - `JWT_SECRET`: A long random string.
+   - `CLIENT_URL`: Your production Vercel URL (e.g., `https://usejetlag.vercel.app`).
+   - `GEMINI_API_KEY`: Your Google AI key.
+   - `CLOUDINARY_...`: Your Cloudinary credentials.
+   - `OPENWEATHER_API_KEY`: Your weather key.
+
+### 2. Frontend (Vercel)
+1. Create a new project on [Vercel](https://vercel.com).
+2. Connect this GitHub repository.
+3. **Root Directory**: `client`
+4. **Framework Preset**: `Vite`
+5. **Environment Variables**:
+   - `VITE_API_URL`: Your production Render URL (e.g., `https://usejetlag-api.onrender.com`).
+
+---
+
+## License
+MIT
