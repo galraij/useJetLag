@@ -11,7 +11,7 @@ const TripModel = {
 
   async getByUser(userId) {
     const { rows } = await pool.query(
-      `SELECT * FROM trips WHERE user_id = $1 ORDER BY id DESC`,
+      `SELECT * FROM trips WHERE user_id = $1 AND is_published = true ORDER BY id DESC`,
       [userId]
     );
     return rows;
@@ -42,10 +42,10 @@ const TripModel = {
     return rows[0];
   },
 
-  async updateStory(id, { story_summary, points_of_interest, is_published }) {
+  async updateStory(id, { story_summary, overview_title, points_of_interest, is_published }) {
     const { rows } = await pool.query(
-      `UPDATE trips SET story_summary = $1, points_of_interest = $2, is_published = COALESCE($3, is_published) WHERE id = $4 RETURNING *`,
-      [story_summary, JSON.stringify(points_of_interest), is_published, id]
+      `UPDATE trips SET story_summary = $1, overview_title = $2, points_of_interest = $3, is_published = COALESCE($4, is_published) WHERE id = $5 RETURNING *`,
+      [story_summary, overview_title, JSON.stringify(points_of_interest), is_published, id]
     );
     return rows[0];
   },

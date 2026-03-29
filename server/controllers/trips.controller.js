@@ -130,18 +130,19 @@ async function publishTripStory(req, res, next) {
     }
 
     const { slug } = req.params;
-    const { title, story_summary, points_of_interest, pictures } = req.body;
+    const { title, story_summary, overview_title, points_of_interest, pictures } = req.body;
 
     const trip = await TripModel.getBySlug(slug);
     if (!trip) return res.status(404).json({ error: 'Trip not found' });
 
-    // Ensure safe slug if title changes
-    const newSlug = trip.title === title ? slug : title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now();
+    // If already published, preserve the slug to avoid URL/routing refreshes
+    const newSlug = trip.is_published ? slug : 
+      (trip.title === title ? slug : title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now());
     
     // Update Title & Story
     const activeUserId = trip.is_published ? null : userId;
     await TripModel.update(trip.id, { title, slug: newSlug, userId: activeUserId });
-    await TripModel.updateStory(trip.id, { story_summary, points_of_interest, is_published: true });
+    await TripModel.updateStory(trip.id, { story_summary, overview_title, points_of_interest, is_published: true });
 
     // Fetch the fresh full record containing joined users table (user_name)
     const fullyUpdatedTrip = await TripModel.getBySlug(newSlug);

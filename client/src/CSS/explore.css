@@ -112,11 +112,29 @@ select {
 /* GRID */
 .trip-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, 300px);
+  grid-template-columns: repeat(1, 1fr);
   gap: 30px;
   justify-content: center;
-  max-width: 1620px;
+  max-width: 1400px;
   margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .trip-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .trip-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .trip-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 /* ─── SKELETON LOADING ──────────────────────────────── */
@@ -133,7 +151,8 @@ select {
 }
 
 .skeleton-card {
-  width: 300px;
+  width: 100%;
+  max-width: 400px;
   background: white;
   border-radius: 12px;
   overflow: hidden;

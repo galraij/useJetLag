@@ -126,15 +126,15 @@ export default function TripsPage() {
                   </Group>
                 </Stack>
                 <Group mt="md" gap="xs">
-                  {trip.is_published ? (
-                    <Button component={Link} to={`/trip/${trip.slug}`} flex={1} size="sm" color="green">
-                      View Trip
-                    </Button>
-                  ) : (
-                    <Button component={Link} to={`/trip/${trip.slug}`} flex={1} size="sm" color="orange">
-                      {trip.photosCount > 0 ? 'Edit Draft' : 'Add Photos'}
-                    </Button>
-                  )}
+                  <Button 
+                    component={Link} 
+                    to={`/trip/${trip.slug}`} 
+                    flex={1} 
+                    size="sm" 
+                    color={trip.is_published ? "blue" : "grape"}
+                  >
+                    {trip.is_published ? 'View Trip' : (trip.photosCount > 0 ? 'Generate Story' : 'Add Photos')}
+                  </Button>
                   <ActionIcon color="red" variant="light" size="lg" onClick={() => handleDelete(trip.id)}>
                     <Trash2 size={16} />
                   </ActionIcon>

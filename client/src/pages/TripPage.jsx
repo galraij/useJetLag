@@ -5,6 +5,7 @@ import { Sparkles, MapPin, X, Check } from 'lucide-react';
 import { getTripBySlug, generateTripStory, publishTripStory } from '../api/trips.api';
 import { deletePicture } from '../api/upload.api';
 import PictureItem from '../components/upload/PictureItem';
+import TripOverview from '../components/trip/TripOverview';
 import useAuth from '../hooks/useAuth';
 
 export default function TripPage() {
@@ -17,7 +18,6 @@ export default function TripPage() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const [isDraft, setIsDraft] = useState(false);
   const [isEditingMode, setIsEditingMode] = useState(false);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function TripPage() {
               localStorage.removeItem('pendingTripPublish');
               setTrip(restoredTrip);
               setPictures(savedPictures);
-              if (restoredTrip.story_summary) setIsDraft(true);
+              if (restoredTrip.story_summary) setIsEditingMode(true);
               setLoading(false);
               return; // Skip normal fetch — restored from pending draft
             }
@@ -60,10 +60,8 @@ export default function TripPage() {
         
         setTrip(loadedTrip);
         setPictures(data.pictures || []);
-        if (loadedTrip.story_summary) setIsDraft(true);
       } catch (error) {
         console.error("Failed to load trip", error);
-        alert("Trip not found");
       } finally {
         setLoading(false);
       }
@@ -92,34 +90,46 @@ export default function TripPage() {
       const { data } = await generateTripStory(slug);
       const geminiJSON = data.geminiJSON;
       
-      setTrip(prev => ({
-        ...prev,
+      const newTrip = {
+        ...trip,
         title: geminiJSON.catchy_title,
         story_summary: geminiJSON.full_narrative_summary,
-        points_of_interest: geminiJSON.points_of_interest
-      }));
+        points_of_interest: geminiJSON.points_of_interest,
+        overview_title: geminiJSON.overview_title || "Trip Overview"
+      };
 
-      setPictures(prev => prev.map(pic => {
+      const newPictures = pictures.map(pic => {
         const aiMatch = geminiJSON.photos.find(p => p.image_id === String(pic.id));
         if (aiMatch) {
           return { ...pic, punchy_description: aiMatch.punchy_description, story_segment: aiMatch.associated_story_segment };
         }
         return pic;
-      }));
+      });
 
-      setIsDraft(true);
+      setTrip(newTrip);
+      setPictures(newPictures);
+
+      setTrip(newTrip);
+      setPictures(newPictures);
+
+      // Automatically enter Edit Mode to allow user to review and tweak before finalizing
+      setIsEditingMode(true);
+
+      if (!isLoggedIn) {
+        // No alert, just stay on page in Edit Mode
+      }
     } catch (err) {
       console.error(err);
       alert('Failed to generate story. Check your Gemini API Key!');
     } finally {
       setGenerating(false);
+      setPublishing(false);
     }
   }
 
-  async function handlePublish() {
+  async function handleSimpleSave() {
     if (!isLoggedIn) {
-      localStorage.setItem('pendingTripPublish', JSON.stringify({ trip, pictures }));
-      navigate('/login', { state: { from: `/trip/${slug}` } });
+      handleSaveAnonymous();
       return;
     }
     setPublishing(true);
@@ -127,6 +137,7 @@ export default function TripPage() {
       const payload = {
         title: trip.title,
         story_summary: trip.story_summary,
+        overview_title: trip.overview_title,
         points_of_interest: trip.points_of_interest,
         pictures: pictures.map(p => ({
           id: p.id,
@@ -134,18 +145,28 @@ export default function TripPage() {
           story_segment: p.story_segment
         }))
       };
+      
       const { data } = await publishTripStory(slug, payload);
       setTrip(data.trip);
       setPictures(data.pictures || []);
       setIsEditingMode(false);
-      // Show the published story immediately
-      navigate(`/trip/${data.trip.slug}`, { replace: true });
+      
+      // Only navigate if the slug changed (to avoid unnecessary refresh)
+      if (data.trip.slug !== slug) {
+        navigate(`/trip/${data.trip.slug}`, { replace: true });
+      }
     } catch (err) {
       console.error(err);
-      alert('Failed to publish story');
+      alert('Failed to save changes');
     } finally {
       setPublishing(false);
     }
+  }
+
+  async function handleSaveAnonymous() {
+    // Save to localStorage and redirect to login (Preserved bridge as requested)
+    localStorage.setItem('pendingTripPublish', JSON.stringify({ trip, pictures }));
+    navigate('/login', { state: { from: `/trip/${slug}` } });
   }
 
   const pois = trip.points_of_interest || [];
@@ -195,25 +216,7 @@ export default function TripPage() {
       ) : (
         <Grid gutter="xl">
           <Grid.Col span={{ base: 12, md: 8 }}>
-            {trip.story_summary && (
-              <Card shadow="sm" p="lg" radius="md" mb="xl" bg="gray.1" withBorder style={{ position: 'relative' }}>
-                {!isPub && (
-                  <ActionIcon 
-                    size="sm" color="red" variant="subtle" title="Delete Overview" 
-                    style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }} 
-                    onClick={() => setTrip({ ...trip, story_summary: '' })}
-                  >
-                    <X size={16} />
-                  </ActionIcon>
-                )}
-                <Title order={3} c="grape.7" mb="sm" pl={isPub ? 0 : 24}>Trip Overview</Title>
-                <Textarea 
-                  autosize size="lg" variant="unstyled" value={trip.story_summary} readOnly={isPub}
-                  styles={{ input: { color: '#000', lineHeight: 1.6, paddingLeft: isPub ? '0' : '8px' } }}
-                  onChange={(e) => setTrip({ ...trip, story_summary: e.currentTarget.value })}
-                />
-              </Card>
-            )}
+            <TripOverview trip={trip} setTrip={setTrip} isPub={isPub} />
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
               {groupedPictures.map((group, groupIndex) => {
@@ -336,16 +339,18 @@ export default function TripPage() {
       )}
 
       {!isPub && (
-        <Center mt="xl" pb="xl">
-          {!isDraft ? (
-            <Button onClick={handleGenerateStory} loading={generating} leftSection={<Sparkles size={16} />} color="grape" size="lg">
-              useJetLag
-            </Button>
-          ) : (
-            <Button onClick={handlePublish} loading={publishing} leftSection={<Check size={16} />} color="green" size="lg">
-              {isEditingMode ? 'Save Changes' : 'Publish My Trip'}
-            </Button>
-          )}
+        <Center mt="xl" pb="xl" style={{ flexDirection: 'column', gap: '1rem' }}>
+          <Button 
+            onClick={isEditingMode || (trip.story_summary && !trip.is_published) ? handleSimpleSave : handleGenerateStory} 
+            loading={generating || publishing} 
+            leftSection={isEditingMode || (trip.story_summary && !trip.is_published) ? <Check size={16} /> : <Sparkles size={16} />} 
+            color={isEditingMode || (trip.story_summary && !trip.is_published) ? "green" : "grape"} 
+            size="lg"
+          >
+            {trip.is_published 
+              ? (isEditingMode ? 'Save Changes' : 'Back to My Trips') 
+              : (trip.story_summary ? 'Save Final Story' : 'useJetLag')}
+          </Button>
         </Center>
       )}
 
