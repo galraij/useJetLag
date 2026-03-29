@@ -36,7 +36,7 @@ export default function GetStartedUploadPage() {
       
       {!uploadData ? (
         <>
-          <Text mb="md">Upload multiple pictures to get started. We will extract EXIF data such as geolocation and timestamps automatically.</Text>
+          <Text mb="md">Upload your photos to start!</Text>
           {loading ? (
             <Text>Uploading and processing images, please wait...</Text>
           ) : (

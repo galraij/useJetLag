@@ -29,10 +29,10 @@ export default function FolderDropZone({ onFiles }) {
     >
       <Stack align="center" gap="sm">
         <Text size="xl">📁</Text>
-        <Text fw={500}>גרור תיקייה לכאן</Text>
-        <Text size="sm" c="dimmed">JPG, PNG, HEIC — עד 20 תמונות</Text>
+        <Text fw={500}>Drag & drop your photos here</Text>
+        <Text size="sm" c="dimmed">JPG, PNG, HEIC — up to 20 photos</Text>
         <Button variant="outline" onClick={(e) => { e.stopPropagation(); inputRef.current.click(); }}>
-          בחר תמונות
+          Browse Photos
         </Button>
       </Stack>
       <input

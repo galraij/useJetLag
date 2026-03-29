@@ -4,8 +4,22 @@ import TripCard from "./TripCard";
 import "../../CSS/discover.css";
 import { getLatestPublishedTrips } from "../../api/trips.api";
 
+function SkeletonCard() {
+  return (
+    <div className="discover-skeleton-card">
+      <div className="discover-skeleton-img discover-skeleton-shimmer" />
+      <div className="discover-skeleton-body">
+        <div className="discover-skeleton-line wide discover-skeleton-shimmer" />
+        <div className="discover-skeleton-line medium discover-skeleton-shimmer" />
+        <div className="discover-skeleton-line narrow discover-skeleton-shimmer" />
+      </div>
+    </div>
+  );
+}
+
 const DiscoverTrips = () => {
   const [trips, setTrips] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getLatestPublishedTrips(8)
@@ -14,7 +28,8 @@ const DiscoverTrips = () => {
           setTrips(res.data.trips);
         }
       })
-      .catch((err) => console.error("Error fetching latest trips", err));
+      .catch((err) => console.error("Error fetching latest trips", err))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -27,15 +42,19 @@ const DiscoverTrips = () => {
         </div>
 
         <div className="grid">
-          {trips.map((trip) => (
-            <Link to={`/trip/${trip.slug}`} key={trip.id} style={{ textDecoration: 'none' }}>
-              <TripCard 
-                trip={trip} 
-                onTripDeleted={(id) => setTrips(prev => prev.filter(t => t.id !== id))} 
-              />
-            </Link>
-          ))}
+          {loading
+            ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
+            : trips.map((trip) => (
+                <Link to={`/trip/${trip.slug}`} key={trip.id} style={{ textDecoration: 'none' }}>
+                  <TripCard
+                    trip={trip}
+                    onTripDeleted={(id) => setTrips(prev => prev.filter(t => t.id !== id))}
+                  />
+                </Link>
+              ))
+          }
         </div>
+
         <div className="view-all-container">
           <Link to="/explore">
             <button className="view-all-btn">
