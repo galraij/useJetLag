@@ -4,7 +4,7 @@ import { Container, Title, Text, Button, Grid, Card, Image, Group, Stack, Aspect
 import { Plus, MapPin, Calendar, Upload, Trash2 } from 'lucide-react';
 import { getMyTrips } from '../api/trips.api';
 import useAuth from '../hooks/useAuth';
-import '../CSS/tripCard.css';
+import '../CSS/trip-card.css';
 
 export default function TripsPage() {
   const [userTrips, setUserTrips] = useState([]);
