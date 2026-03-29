@@ -1,4 +1,4 @@
-import "../../CSS/TripCard.css"
+import "../../CSS/tripCard.css"
 import useAuth from "../../hooks/useAuth";
 import { ActionIcon } from "@mantine/core";
 import { Trash, Edit } from "lucide-react";
