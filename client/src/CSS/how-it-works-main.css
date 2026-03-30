@@ -92,7 +92,37 @@
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
+  .how-container {
+    padding: 40px 10px;
+  }
+  
   .cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .card {
+    padding: 20px 10px;
+  }
+
+  .icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+  }
+
+  .icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .card h3 {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+
+  .card p {
+    font-size: 11px;
+    line-height: 1.2;
   }
 }
