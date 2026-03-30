@@ -7,7 +7,7 @@ async function generateStory(pictures) {
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
   const prompt = `You are a creative travel storyteller and data analyst. You will be provided with a series of images and corresponding metadata (JSON objects) for each.
 
